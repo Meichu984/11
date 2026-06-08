@@ -1,0 +1,302 @@
+HTML
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地政知識大樂透 - 水里地政事務所</title>
+    <style>
+        /* 活潑漸層背景 */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%);
+            font-family: '微軟正黑體', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 漂浮的背景裝飾圖案 */
+        .bg-icon {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.1;
+            z-index: 0;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(20deg); }
+        }
+
+        h1 {
+            color: #2e7d32;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            font-size: 42px;
+            z-index: 1;
+        }
+
+        /* 遊戲主要區塊 */
+        #game-board {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 20px;
+            z-index: 1;
+        }
+
+        /* 樂透機設計 */
+        .machine-container {
+            position: relative;
+            width: 380px;
+            height: 380px;
+        }
+
+        .lottery-machine {
+            width: 350px;
+            height: 350px;
+            border: 12px solid #ffb300;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.1), 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        /* 樂透球樣式 */
+        .ball {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* 角色位置 */
+        .character-img {
+            width: 220px;
+            filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.1));
+            animation: bounce 3s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 題目面板 */
+        .quiz-panel {
+            width: 600px;
+            min-height: 150px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            border: 4px dashed #81c784;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            z-index: 1;
+        }
+
+        #question { font-size: 24px; color: #333; line-height: 1.5; }
+        #answer { 
+            margin-top: 20px; 
+            font-size: 26px; 
+            color: #d32f2f; 
+            font-weight: bold; 
+            background: #ffebee; 
+            padding: 10px; 
+            border-radius: 10px;
+            display: none; 
+        }
+
+        /* 按鈕設計 */
+        .controls { margin-top: 25px; z-index: 1; }
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            margin: 0 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #start-btn { background: linear-gradient(to bottom, #4caf50, #2e7d32); box-shadow: 0 5px #1b5e20; }
+        #ans-btn { background: linear-gradient(to bottom, #ff9800, #f57c00); box-shadow: 0 5px #e65100; }
+
+        button:active { transform: translateY(4px); box-shadow: 0 1px #1b5e20; }
+        button:disabled { background: #bbb; box-shadow: 0 5px #888; cursor: not-allowed; }
+
+        footer {
+            margin-top: auto;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1b5e20;
+            background: rgba(255,255,255,0.5);
+            padding: 5px 20px;
+            border-radius: 20px;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-icon" style="top:10%; left:10%;">🏠</div>
+    <div class="bg-icon" style="top:20%; right:15%;">🗺️</div>
+    <div class="bg-icon" style="bottom:20%; left:15%;">🌳</div>
+    <div class="bg-icon" style="bottom:10%; right:10%;">🏢</div>
+    <div class="bg-icon" style="top:50%; left:5%;">📏</div>
+
+    <h1>地政知識大樂透</h1>
+
+    <div id="game-board">
+        <div class="machine-container">
+            <div class="lottery-machine" id="machine">
+                </div>
+        </div>
+
+        <img src="C:\Users\Rita_Chen\Desktop\loto\character.png.png" class="character-img" alt="地政小幫手" onerror="this.style.display='none'; alert('請確認同資料夾內有 character.png 圖片檔案！')">
+    </div>
+
+    <div class="quiz-panel">
+        <div id="question">🎉 準備好測試你的地政知識了嗎？<br>請點擊下方按鈕開始！</div>
+        <div id="answer"></div>
+    </div>
+
+    <div class="controls">
+        <button id="start-btn" onclick="startLottery()">開始抽題</button>
+        <button id="ans-btn" onclick="showAnswer()" disabled>顯示答案</button>
+    </div>
+
+    <footer>水里地政事務所</footer>
+
+<script>
+    const quizData = [
+        {q: "【1號球】土地登記之申請，應於權利變更後幾日內為之？<br>(A) 15日 (B) 30日 (C) 60日", a: "正確答案：(B) 30日"},
+        {q: "【2號球】不動產移轉登記時，買方需繳納何種稅賦？<br>(A) 地價稅 (B) 房屋稅 (C) 契稅", a: "正確答案：(C) 契稅"},
+        {q: "【3號球】土地所有權狀遺失，應向何處申請補發？<br>(A) 鄉鎮公所 (B) 國稅局 (C) 地政事務所", a: "正確答案：(C) 地政事務所"},
+        {q: "【4號球】下列何者為地政士之主要專業服務項目？<br>(A) 代理土地登記 (B) 車禍賠償調解 (C) 醫療糾紛諮詢", a: "正確答案：(A) 代理土地登記"},
+        {q: "【5號球】實施地籍圖重測的主要目的是什麼？<br>(A) 增加政府稅收 (B) 釐清界址保障權益 (C) 縮減土地面積", a: "正確答案：(B) 釐清界址保障權益"},
+        {q: "【6號球】外國人在我國取得土地，應報請哪個機關核准？<br>(A) 縣市政府 (B) 村里辦公處 (C) 警察局", a: "正確答案：(A) 縣市政府"},
+        {q: "【7號球】土地買賣移轉時，必須繳納的「地方稅」為？<br>(A) 土地增值稅 (B) 所得稅 (C) 營業稅", a: "正確答案：(A) 土地增值稅"},
+        {q: "【8號球】申請土地複丈（鑑界）應向何處辦理？<br>(A) 法院 (B) 地政事務所 (C) 建設局", a: "正確答案：(B) 地政事務所"},
+        {q: "【9號球】不動產產權最基礎、具公示效力的憑證是？<br>(A) 地籍圖 (B) 土地登記簿 (C) 房屋買賣契約書", a: "正確答案：(B) 土地登記簿"},
+        {q: "【10號球】下列何者「不屬於」地政事務所的業務範圍？<br>(A) 土地登記 (B) 土地測量 (C) 戶籍遷入登記", a: "正確答案：(C) 戶籍遷入登記"}
+    ];
+
+    const ballColors = ['#f44336', '#e91e63', '#9c27b0', '#2196f3', '#00bcd4', '#4caf50', '#8bc34a', '#ffeb3b', '#ff9800', '#795548'];
+    let currentQuiz = null;
+    const machine = document.getElementById('machine');
+
+    // 初始化 10 顆球
+    function initBalls() {
+        machine.innerHTML = '';
+        for (let i = 1; i <= 10; i++) {
+            const ball = document.createElement('div');
+            ball.className = 'ball';
+            ball.innerText = i;
+            ball.style.backgroundColor = ballColors[i-1];
+            // 隨機初始位置
+            resetBallPos(ball);
+            machine.appendChild(ball);
+        }
+    }
+
+    function resetBallPos(ball) {
+        ball.style.left = (Math.random() * 280) + 'px';
+        ball.style.top = (Math.random() * 280) + 'px';
+    }
+
+    function startLottery() {
+        const startBtn = document.getElementById('start-btn');
+        const ansBtn = document.getElementById('ans-btn');
+        const qDiv = document.getElementById('question');
+        const aDiv = document.getElementById('answer');
+
+        startBtn.disabled = true;
+        ansBtn.disabled = true;
+        aDiv.style.display = 'none';
+        qDiv.innerHTML = "🌀 樂透機翻滾中... 請期待！";
+
+        let balls = document.querySelectorAll('.ball');
+        
+        // 開始翻滾動畫 (持續5秒)
+        let startTime = Date.now();
+        let interval = setInterval(() => {
+            balls.forEach(ball => {
+                ball.style.left = (Math.random() * 290) + 'px';
+                ball.style.top = (Math.random() * 290) + 'px';
+                ball.style.transform = `rotate(${Math.random() * 360}deg)`;
+            });
+            
+            if (Date.now() - startTime >= 5000) {
+                clearInterval(interval);
+                selectBall();
+            }
+        }, 150);
+    }
+
+    function selectBall() {
+        const randomIndex = Math.floor(Math.random() * quizData.length);
+        currentQuiz = quizData[randomIndex];
+        
+        // 視覺上把中獎的那顆球移到中間
+        let balls = document.querySelectorAll('.ball');
+        balls.forEach((ball, idx) => {
+            if (idx === randomIndex) {
+                ball.style.left = '150px';
+                ball.style.top = '150px';
+                ball.style.transform = 'scale(1.5)';
+                ball.style.zIndex = '10';
+            } else {
+                ball.style.opacity = '0.3';
+                ball.style.transform = 'scale(0.8)';
+            }
+        });
+
+        document.getElementById('question').innerHTML = currentQuiz.q;
+        document.getElementById('ans-btn').disabled = false;
+    }
+
+    function showAnswer() {
+        const aDiv = document.getElementById('answer');
+        aDiv.innerHTML = currentQuiz.a;
+        aDiv.style.display = 'block';
+        document.getElementById('start-btn').disabled = false;
+        document.getElementById('ans-btn').disabled = true;
+        
+        // 恢復球的透明度準備下次抽獎
+        setTimeout(() => {
+            let balls = document.querySelectorAll('.ball');
+            balls.forEach(ball => {
+                ball.style.opacity = '1';
+                ball.style.transform = 'scale(1)';
+                resetBallPos(ball);
+            });
+        }, 1000);
+    }
+
+    window.onload = initBalls;
+</script>
+
+</body>
+</html>
